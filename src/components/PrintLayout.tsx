@@ -6,6 +6,7 @@ const PAPER_DIMENSIONS: Record<PaperSize, { width: number; height: number }> = {
   'A3': { width: 297, height: 420 },
   'A2': { width: 420, height: 594 },
   'A1': { width: 594, height: 841 },
+  'custom': { width: 210, height: 297 },
 };
 import { EnvelopeTemplate } from './EnvelopeTemplate';
 import { motion, AnimatePresence } from 'motion/react';
@@ -19,18 +20,22 @@ interface Props {
 
 export const PrintLayout: React.FC<Props> = ({ dimensions, elements, onBack }) => {
   const [paperSize, setPaperSize] = useState<PaperSize>('A4');
+  const [customPaperWidth, setCustomPaperWidth] = useState<number>(210);
+  const [customPaperHeight, setCustomPaperHeight] = useState<number>(297);
   const [orientation, setOrientation] = useState<PaperOrientation>('portrait');
   const [items, setItems] = useState<PrintItem[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [autoCount, setAutoCount] = useState<number>(1);
   const [dragPos, setDragPos] = useState<{ x: number, y: number } | null>(null);
 
-  const basePaperDim = PAPER_DIMENSIONS[paperSize];
+  const basePaperDim = paperSize === 'custom' 
+    ? { width: customPaperWidth, height: customPaperHeight }
+    : PAPER_DIMENSIONS[paperSize];
   const paperDim = orientation === 'portrait' 
     ? basePaperDim 
     : { width: basePaperDim.height, height: basePaperDim.width };
   
-  const MARGIN = 10;
+  const MARGIN = 20;
   const GAP = 5;
 
   const templateWidth = dimensions.templateType === 'box' 
@@ -79,7 +84,7 @@ export const PrintLayout: React.FC<Props> = ({ dimensions, elements, onBack }) =
 
   useEffect(() => {
     autoLayout();
-  }, [dimensions, paperSize, orientation]);
+  }, [dimensions, paperSize, orientation, customPaperWidth, customPaperHeight]);
 
   const addItem = () => {
     const newItem: PrintItem = {
@@ -173,8 +178,29 @@ export const PrintLayout: React.FC<Props> = ({ dimensions, elements, onBack }) =
                 <option value="A3">A3</option>
                 <option value="A2">A2</option>
                 <option value="A1">A1</option>
+                <option value="custom">Tùy chỉnh</option>
               </select>
             </div>
+            {paperSize === 'custom' && (
+              <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-lg">
+                <input 
+                  type="number" 
+                  value={customPaperWidth} 
+                  onChange={(e) => setCustomPaperWidth(Number(e.target.value))}
+                  className="w-16 bg-white px-2 py-1 rounded border border-slate-200 text-xs font-bold outline-none"
+                  placeholder="W"
+                />
+                <span className="text-[10px] font-bold text-slate-400">x</span>
+                <input 
+                  type="number" 
+                  value={customPaperHeight} 
+                  onChange={(e) => setCustomPaperHeight(Number(e.target.value))}
+                  className="w-16 bg-white px-2 py-1 rounded border border-slate-200 text-xs font-bold outline-none"
+                  placeholder="H"
+                />
+                <span className="text-[10px] font-bold text-slate-500 px-1 uppercase">mm</span>
+              </div>
+            )}
             <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-lg">
               <span className="text-[10px] font-bold text-slate-500 px-2 uppercase">Hướng:</span>
               <select 

@@ -245,8 +245,8 @@ export const EnvelopeTemplate: React.FC<Props> = ({
       {/* A4 Reference Background */}
       {showA4Reference && (
         <rect 
-          x={(viewWidth - A4_W) / 2} 
-          y={(viewHeight - A4_H) / 2} 
+          x={padding - 20} 
+          y={padding - 20} 
           width={A4_W} 
           height={A4_H} 
           fill="#f8fafc" 

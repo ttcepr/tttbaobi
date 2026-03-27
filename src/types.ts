@@ -1,6 +1,6 @@
 export type FlapCorner = 'diagonal' | 'round' | 'square' | 'fancy';
 export type TemplateType = 'envelope' | 'fold3' | 'invitation' | 'box' | 'custom';
-export type PaperSize = 'A4' | 'A3' | 'A2' | 'A1';
+export type PaperSize = 'A4' | 'A3' | 'A2' | 'A1' | 'custom';
 export type PaperOrientation = 'portrait' | 'landscape';
 
 export interface EnvelopeDimensions {

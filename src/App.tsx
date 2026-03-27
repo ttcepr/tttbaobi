@@ -34,8 +34,8 @@ import { PrintLayout } from './components/PrintLayout';
 import { Box3D } from './components/Box3D';
 
 const INITIAL_DIMENSIONS: EnvelopeDimensions = {
-  width: 80,
-  height: 160,
+  width: 210,
+  height: 297,
   depth: 40,
   flapTopHeight: 30,
   flapBottomHeight: 15,
@@ -43,7 +43,7 @@ const INITIAL_DIMENSIONS: EnvelopeDimensions = {
   topFlapType: 'round',
   bottomFlapType: 'diagonal',
   sideFlapType: 'diagonal',
-  templateType: 'envelope',
+  templateType: 'custom',
   borderThickness: 0.5,
   cutLineX: 50,
   cutLineY: 15,
@@ -56,7 +56,7 @@ export default function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isPrinting, setIsPrinting] = useState(false);
   const [activeTab, setActiveTab] = useState<'dims' | 'text' | 'image' | 'shapes'>('dims');
-  const [showA4Ref, setShowA4Ref] = useState(false);
+  const [showA4Ref, setShowA4Ref] = useState(true);
   const [show3D, setShow3D] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -88,11 +88,7 @@ export default function App() {
   ];
 
   const PRESETS = [
-    { name: 'A4', w: 210, h: 297 },
-    { name: 'A3', w: 297, h: 420 },
-    { name: 'Banner (1m)', w: 1000, h: 300 },
-    { name: 'Banner (2m)', w: 2000, h: 500 },
-    { name: 'Khổ lớn (2.5m)', w: 2500, h: 2500 },
+    { name: 'Khổ A4 (Mặc định)', w: 210, h: 297 },
   ];
 
   const handleDimChange = (key: keyof EnvelopeDimensions, value: any) => {
@@ -298,7 +294,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#f8f9fa] flex flex-col font-sans text-slate-900">
       {/* Header */}
-      <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-50">
+      <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-50 no-print">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
             <LayoutGrid size={24} />
@@ -366,23 +362,27 @@ export default function App() {
             </div>
           )}
 
-          <button 
-            onClick={saveDesign}
-            className="p-2 text-slate-500 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all flex items-center gap-2 text-xs font-bold"
-            title="Lưu thiết kế hiện tại"
-          >
-            <Save size={18} />
-            Lưu
-          </button>
-          <button 
-            onClick={loadDesign}
-            className="p-2 text-slate-500 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all flex items-center gap-2 text-xs font-bold"
-            title="Tải thiết kế đã lưu"
-          >
-            <Download size={18} className="rotate-0" />
-            Mở
-          </button>
-          <div className="h-6 w-px bg-slate-200 mx-2" />
+          {!isPrinting && (
+            <>
+              <button 
+                onClick={saveDesign}
+                className="p-2 text-slate-500 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all flex items-center gap-2 text-xs font-bold"
+                title="Lưu thiết kế hiện tại"
+              >
+                <Save size={18} />
+                Lưu
+              </button>
+              <button 
+                onClick={loadDesign}
+                className="p-2 text-slate-500 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all flex items-center gap-2 text-xs font-bold"
+                title="Tải thiết kế đã lưu"
+              >
+                <Download size={18} className="rotate-0" />
+                Mở
+              </button>
+              <div className="h-6 w-px bg-slate-200 mx-2" />
+            </>
+          )}
           {!isPrinting && (
             <button 
               onClick={() => setIsPrinting(true)}
@@ -1023,7 +1023,7 @@ export default function App() {
       </main>
 
       {/* Footer / Status */}
-      <footer className="h-8 bg-white border-t border-slate-200 flex items-center justify-between px-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+      <footer className="h-8 bg-white border-t border-slate-200 flex items-center justify-between px-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest no-print">
         <div className="flex gap-4">
           <span>Khổ giấy: A4 (210x297mm)</span>
           <span>Đơn vị: Milimet (mm)</span>

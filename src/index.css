@@ -1,0 +1,14 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Dancing+Script:wght@400;700&family=Montserrat:wght@400;700&family=Pacifico&family=Roboto+Mono&family=Great+Vibes&family=Charm:wght@400;700&family=Niconne&family=Pinyon+Script&family=Saira+Stencil+One&display=swap');
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", serif;
+  --font-script: "Dancing Script", cursive;
+  --font-display: "Pacifico", cursive;
+  --font-mono: "Roboto Mono", monospace;
+  --font-calligraphy: "Great Vibes", cursive;
+  --font-fancy: "Charm", cursive;
+  --font-elegant: "Pinyon Script", cursive;
+  --font-stencil: "Saira Stencil One", cursive;
+}

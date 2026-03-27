@@ -35,7 +35,10 @@ export const PrintLayout: React.FC<Props> = ({ dimensions, elements, onBack }) =
     ? basePaperDim 
     : { width: basePaperDim.height, height: basePaperDim.width };
   
-  const MARGIN = 20;
+  const MARGIN_LEFT = 7;
+  const MARGIN_TOP = 7;
+  const MARGIN_RIGHT = 7;
+  const MARGIN_BOTTOM = 40; // Tránh chồng lên khung thông tin
   const GAP = 5;
 
   const templateWidth = dimensions.templateType === 'box' 
@@ -51,11 +54,11 @@ export const PrintLayout: React.FC<Props> = ({ dimensions, elements, onBack }) =
 
   // Auto layout logic
   const autoLayout = (count?: number) => {
-    const cols = Math.floor((paperDim.width - 2 * MARGIN + GAP) / (templateWidth + GAP));
-    const rows = Math.floor((paperDim.height - 2 * MARGIN + GAP) / (templateHeight + GAP));
+    const cols = Math.floor((paperDim.width - MARGIN_LEFT - MARGIN_RIGHT + GAP) / (templateWidth + GAP));
+    const rows = Math.floor((paperDim.height - MARGIN_TOP - MARGIN_BOTTOM + GAP) / (templateHeight + GAP));
     
-    const colsRotated = Math.floor((paperDim.width - 2 * MARGIN + GAP) / (templateHeight + GAP));
-    const rowsRotated = Math.floor((paperDim.height - 2 * MARGIN + GAP) / (templateWidth + GAP));
+    const colsRotated = Math.floor((paperDim.width - MARGIN_LEFT - MARGIN_RIGHT + GAP) / (templateHeight + GAP));
+    const rowsRotated = Math.floor((paperDim.height - MARGIN_TOP - MARGIN_BOTTOM + GAP) / (templateWidth + GAP));
 
     const useRotated = (colsRotated * rowsRotated) > (cols * rows);
     const finalCols = useRotated ? colsRotated : cols;
@@ -72,8 +75,8 @@ export const PrintLayout: React.FC<Props> = ({ dimensions, elements, onBack }) =
       for (let c = 0; c < finalCols && added < targetCount; c++) {
         newItems.push({
           id: Math.random().toString(36).substr(2, 9),
-          x: MARGIN + c * (itemWidth + GAP),
-          y: MARGIN + r * (itemHeight + GAP),
+          x: MARGIN_LEFT + c * (itemWidth + GAP),
+          y: MARGIN_TOP + r * (itemHeight + GAP),
           rotation: useRotated ? 90 : 0,
         });
         added++;

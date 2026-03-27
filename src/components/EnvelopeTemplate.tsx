@@ -24,11 +24,30 @@ export const EnvelopeTemplate: React.FC<Props> = ({
   showA4Reference = false,
   padding = 20,
 }) => {
-  const { width, height, depth = 0, flapTopHeight, flapBottomHeight, flapSideWidth, topFlapType, bottomFlapType, sideFlapType, templateType } = dimensions;
+  const { width, height, depth = 0, flapTopHeight, flapBottomHeight, flapSideWidth, topFlapType, bottomFlapType, sideFlapType, templateType, borderThickness = 0.5, cutLineX = 50, cutLineY = 15, cutLineWidth = 40 } = dimensions;
   const svgRef = useRef<SVGSVGElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+
+  const getShapePath = (type: string, w: number, h: number) => {
+    switch (type) {
+      case 'triangle':
+        return `M 0 ${-h / 2} L ${w / 2} ${h / 2} L ${-w / 2} ${h / 2} Z`;
+      case 'diamond':
+        return `M 0 ${-h / 2} L ${w / 2} 0 L 0 ${h / 2} L ${-w / 2} 0 Z`;
+      case 'star':
+        const points = [];
+        for (let i = 0; i < 10; i++) {
+          const angle = (i * Math.PI) / 5 - Math.PI / 2;
+          const r = i % 2 === 0 ? w / 2 : w / 4;
+          points.push(`${r * Math.cos(angle)} ${r * Math.sin(angle)}`);
+        }
+        return `M ${points.join(' L ')} Z`;
+      default:
+        return "";
+    }
+  };
 
   // Layout calculations based on template
   let totalWidth = width + width + flapSideWidth;
@@ -165,6 +184,14 @@ export const EnvelopeTemplate: React.FC<Props> = ({
         const delta = (mouseY - dragOffset.y);
         onElementUpdate?.(selectedElementId, { fontSize: Math.max(8, (el.fontSize || 16) + delta * 0.5) });
         setDragOffset({ x: mouseX, y: mouseY });
+      } else if (el.type === 'shape') {
+        const deltaX = (mouseX - dragOffset.x);
+        const deltaY = (mouseY - dragOffset.y);
+        onElementUpdate?.(selectedElementId, { 
+          width: Math.max(5, (el.width || 20) + (deltaX / width) * 100),
+          height: Math.max(5, (el.height || 20) + (deltaY / height) * 100)
+        });
+        setDragOffset({ x: mouseX, y: mouseY });
       } else {
         const delta = (mouseX - dragOffset.x);
         onElementUpdate?.(selectedElementId, { width: Math.max(5, (el.width || 20) + delta * 0.5) });
@@ -220,17 +247,24 @@ export const EnvelopeTemplate: React.FC<Props> = ({
       {/* Template Rendering */}
       {templateType === 'envelope' && (
         <>
-          <rect x={frontX} y={frontY} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
-          <rect x={backX} y={backY} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
-          <line x1={backX + width * 0.2} y1={backY + height * 0.15} x2={backX + width * 0.8} y2={backY + height * 0.15} stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+          <rect x={frontX} y={frontY} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
+          <rect x={backX} y={backY} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
+          <line 
+            x1={backX + width * (cutLineX / 100) - cutLineWidth / 2} 
+            y1={backY + height * (cutLineY / 100)} 
+            x2={backX + width * (cutLineX / 100) + cutLineWidth / 2} 
+            y2={backY + height * (cutLineY / 100)} 
+            stroke={showCutLines ? "#000000" : "none"} 
+            strokeWidth={borderThickness} 
+          />
           <g transform={`translate(${topFlapX}, ${topFlapY})`}>
-            <path d={getFlapPath(width, flapTopHeight, topFlapType, 'top')} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+            <path d={getFlapPath(width, flapTopHeight, topFlapType, 'top')} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
           </g>
           <g transform={`translate(${bottomFlapX}, ${bottomFlapY})`}>
-            <path d={getFlapPath(width, flapBottomHeight, bottomFlapType, 'bottom')} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+            <path d={getFlapPath(width, flapBottomHeight, bottomFlapType, 'bottom')} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
           </g>
           <g transform={`translate(${glueX}, ${glueY})`}>
-            <path d={getFlapPath(flapSideWidth, height, sideFlapType, 'side')} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+            <path d={getFlapPath(flapSideWidth, height, sideFlapType, 'side')} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
           </g>
         </>
       )}
@@ -238,62 +272,62 @@ export const EnvelopeTemplate: React.FC<Props> = ({
       {templateType === 'box' && (
         <>
           {/* Glue Flap */}
-          <path d={`M ${padding} ${frontY + height * 0.1} L ${padding + flapSideWidth} ${frontY} L ${padding + flapSideWidth} ${frontY + height} L ${padding} ${frontY + height * 0.9} Z`} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+          <path d={`M ${padding} ${frontY + height * 0.1} L ${padding + flapSideWidth} ${frontY} L ${padding + flapSideWidth} ${frontY + height} L ${padding} ${frontY + height * 0.9} Z`} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
           
           {/* Back Panel */}
-          <rect x={padding + flapSideWidth} y={frontY} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+          <rect x={padding + flapSideWidth} y={frontY} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
           
           {/* Side Panel 1 */}
-          <rect x={padding + flapSideWidth + width} y={frontY} width={depth} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+          <rect x={padding + flapSideWidth + width} y={frontY} width={depth} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
           
           {/* Front Panel */}
-          <rect x={padding + flapSideWidth + width + depth} y={frontY} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+          <rect x={padding + flapSideWidth + width + depth} y={frontY} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
           
           {/* Side Panel 2 */}
-          <rect x={padding + flapSideWidth + width * 2 + depth} y={frontY} width={depth} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+          <rect x={padding + flapSideWidth + width * 2 + depth} y={frontY} width={depth} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
 
           {/* Top Flaps (on Back and Front) */}
           {/* Top Flap Back */}
           <g transform={`translate(${padding + flapSideWidth}, ${padding})`}>
-            <path d={getFlapPath(width, flapTopHeight, topFlapType, 'top')} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+            <path d={getFlapPath(width, flapTopHeight, topFlapType, 'top')} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
           </g>
           {/* Top Flap Front */}
           <g transform={`translate(${padding + flapSideWidth + width + depth}, ${padding})`}>
-            <path d={getFlapPath(width, flapTopHeight, topFlapType, 'top')} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+            <path d={getFlapPath(width, flapTopHeight, topFlapType, 'top')} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
           </g>
 
           {/* Bottom Flaps (on Back and Front) */}
           {/* Bottom Flap Back */}
           <g transform={`translate(${padding + flapSideWidth}, ${frontY + height})`}>
-            <path d={getFlapPath(width, flapBottomHeight, bottomFlapType, 'bottom')} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+            <path d={getFlapPath(width, flapBottomHeight, bottomFlapType, 'bottom')} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
           </g>
           {/* Bottom Flap Front */}
           <g transform={`translate(${padding + flapSideWidth + width + depth}, ${frontY + height})`}>
-            <path d={getFlapPath(width, flapBottomHeight, bottomFlapType, 'bottom')} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+            <path d={getFlapPath(width, flapBottomHeight, bottomFlapType, 'bottom')} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
           </g>
 
           {/* Dust Flaps (on Sides) */}
           <g transform={`translate(${padding + flapSideWidth + width}, ${frontY})`}>
-             <path d={`M 0 0 L ${depth} 0 L ${depth * 0.8} ${-flapTopHeight * 0.6} L ${depth * 0.2} ${-flapTopHeight * 0.6} Z`} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
-             <path d={`M 0 ${height} L ${depth} ${height} L ${depth * 0.8} ${height + flapBottomHeight * 0.6} L ${depth * 0.2} ${height + flapBottomHeight * 0.6} Z`} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+             <path d={`M 0 0 L ${depth} 0 L ${depth * 0.8} ${-flapTopHeight * 0.6} L ${depth * 0.2} ${-flapTopHeight * 0.6} Z`} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
+             <path d={`M 0 ${height} L ${depth} ${height} L ${depth * 0.8} ${height + flapBottomHeight * 0.6} L ${depth * 0.2} ${height + flapBottomHeight * 0.6} Z`} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
           </g>
           <g transform={`translate(${padding + flapSideWidth + width * 2 + depth}, ${frontY})`}>
-             <path d={`M 0 0 L ${depth} 0 L ${depth * 0.8} ${-flapTopHeight * 0.6} L ${depth * 0.2} ${-flapTopHeight * 0.6} Z`} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
-             <path d={`M 0 ${height} L ${depth} ${height} L ${depth * 0.8} ${height + flapBottomHeight * 0.6} L ${depth * 0.2} ${height + flapBottomHeight * 0.6} Z`} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+             <path d={`M 0 0 L ${depth} 0 L ${depth * 0.8} ${-flapTopHeight * 0.6} L ${depth * 0.2} ${-flapTopHeight * 0.6} Z`} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
+             <path d={`M 0 ${height} L ${depth} ${height} L ${depth * 0.8} ${height + flapBottomHeight * 0.6} L ${depth * 0.2} ${height + flapBottomHeight * 0.6} Z`} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
           </g>
         </>
       )}
 
       {templateType === 'fold3' && (
         <>
-          <rect x={padding} y={padding} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
-          <rect x={padding + width} y={padding} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
-          <rect x={padding + width * 2} y={padding} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+          <rect x={padding} y={padding} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
+          <rect x={padding + width} y={padding} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
+          <rect x={padding + width * 2} y={padding} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
         </>
       )}
 
       {templateType === 'invitation' && (
-        <rect x={padding} y={padding} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+        <rect x={padding} y={padding} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
       )}
 
       {/* Fold Lines */}
@@ -345,7 +379,7 @@ export const EnvelopeTemplate: React.FC<Props> = ({
                     <tspan key={i} x="0" dy={i === 0 ? 0 : '1.2em'}>{line}</tspan>
                   ))}
                 </text>
-              ) : (
+              ) : el.type === 'image' ? (
                 <image
                   href={el.content}
                   x={-(el.width || 20) * width / 200}
@@ -355,6 +389,38 @@ export const EnvelopeTemplate: React.FC<Props> = ({
                     outline: isSelected ? '1px dashed #3b82f6' : 'none'
                   }}
                 />
+              ) : (
+                <g style={{ outline: isSelected ? '1px dashed #3b82f6' : 'none' }}>
+                  {el.content === 'rect' && (
+                    <rect 
+                      x={-(el.width || 20) * width / 200} 
+                      y={-(el.height || 20) * height / 200} 
+                      width={(el.width || 20) * width / 100} 
+                      height={(el.height || 20) * height / 100} 
+                      fill={el.fillColor} 
+                      stroke={el.borderColor} 
+                      strokeWidth={el.borderWidth} 
+                    />
+                  )}
+                  {el.content === 'circle' && (
+                    <circle 
+                      cx="0" 
+                      cy="0" 
+                      r={(el.width || 20) * width / 200} 
+                      fill={el.fillColor} 
+                      stroke={el.borderColor} 
+                      strokeWidth={el.borderWidth} 
+                    />
+                  )}
+                  {(el.content === 'triangle' || el.content === 'star' || el.content === 'diamond') && (
+                    <path 
+                      d={getShapePath(el.content, (el.width || 20) * width / 100, (el.height || 20) * height / 100)} 
+                      fill={el.fillColor} 
+                      stroke={el.borderColor} 
+                      strokeWidth={el.borderWidth} 
+                    />
+                  )}
+                </g>
               )}
 
               {/* Coordinate Display */}
@@ -371,7 +437,7 @@ export const EnvelopeTemplate: React.FC<Props> = ({
               {isSelected && (
                 <circle
                   cx={el.type === 'text' ? 0 : (el.width || 20) * width / 200}
-                  cy={el.type === 'text' ? (el.fontSize || 16) * lines.length * 0.6 : (el.width || 20) * width / 200}
+                  cy={el.type === 'text' ? (el.fontSize || 16) * lines.length * 0.6 : (el.type === 'shape' ? (el.height || 20) * height / 200 : (el.width || 20) * width / 200)}
                   r="3"
                   fill="#3b82f6"
                   style={{ cursor: 'nwse-resize' }}

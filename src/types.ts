@@ -15,6 +15,10 @@ export interface EnvelopeDimensions {
   sideFlapType: FlapCorner;
   templateType: TemplateType;
   guideImage?: string;
+  borderThickness?: number; // Độ dày viền thiết kế
+  cutLineX?: number; // Tọa độ X nét cắt (%)
+  cutLineY?: number; // Tọa độ Y nét cắt (%)
+  cutLineWidth?: number; // Chiều dài nét cắt (mm)
 }
 
 export interface PrintItem {
@@ -26,8 +30,8 @@ export interface PrintItem {
 
 export interface DesignElement {
   id: string;
-  type: 'text' | 'image';
-  content: string; 
+  type: 'text' | 'image' | 'shape';
+  content: string; // For text: string content, for image: base64, for shape: shape type (circle, square, etc.)
   x: number; 
   y: number; 
   fontSize?: number;
@@ -35,7 +39,11 @@ export interface DesignElement {
   color?: string;
   textAlign?: 'left' | 'center' | 'right';
   width?: number; 
+  height?: number; // Added for shapes
   rotation?: number;
+  borderWidth?: number; // Added for shapes/borders
+  borderColor?: string; // Added for shapes
+  fillColor?: string; // Added for shapes
 }
 
 export interface AppState {

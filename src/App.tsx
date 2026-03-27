@@ -19,7 +19,12 @@ import {
   Search,
   Lock,
   User,
-  LogIn
+  LogIn,
+  Square,
+  Circle,
+  Triangle,
+  Star,
+  Diamond
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { EnvelopeDimensions, DesignElement, FlapCorner } from './types';
@@ -39,6 +44,10 @@ const INITIAL_DIMENSIONS: EnvelopeDimensions = {
   bottomFlapType: 'diagonal',
   sideFlapType: 'diagonal',
   templateType: 'envelope',
+  borderThickness: 0.5,
+  cutLineX: 50,
+  cutLineY: 15,
+  cutLineWidth: 40,
 };
 
 export default function App() {
@@ -46,7 +55,7 @@ export default function App() {
   const [elements, setElements] = useState<DesignElement[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isPrinting, setIsPrinting] = useState(false);
-  const [activeTab, setActiveTab] = useState<'dims' | 'text' | 'image'>('dims');
+  const [activeTab, setActiveTab] = useState<'dims' | 'text' | 'image' | 'shapes'>('dims');
   const [showA4Ref, setShowA4Ref] = useState(false);
   const [show3D, setShow3D] = useState(false);
   const [zoom, setZoom] = useState(1);
@@ -93,6 +102,24 @@ export default function App() {
       color: '#000000',
       textAlign: 'center',
       rotation: 0,
+    };
+    setElements([...elements, newEl]);
+    setSelectedId(newEl.id);
+  };
+
+  const addShape = (shapeType: string) => {
+    const newEl: DesignElement = {
+      id: Math.random().toString(36).substr(2, 9),
+      type: 'shape',
+      content: shapeType,
+      x: 50,
+      y: 50,
+      width: 20,
+      height: 20,
+      rotation: 0,
+      fillColor: '#3b82f6',
+      borderColor: '#1d4ed8',
+      borderWidth: 1,
     };
     setElements([...elements, newEl]);
     setSelectedId(newEl.id);
@@ -268,7 +295,7 @@ export default function App() {
             <LayoutGrid size={24} />
           </div>
           <div>
-            <h1 className="font-bold text-lg leading-tight">Thiết kế Bao bì Pro - 033.6868.332 - Satoh Thái</h1>
+            <h1 className="font-bold text-lg leading-tight">Phần mềm thiết kế bao bì - Liên hệ: 033.6868.332</h1>
             <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Bao Lì Xì & Phong bì chuyên nghiệp</p>
           </div>
         </div>
@@ -328,7 +355,7 @@ export default function App() {
 
           <button 
             onClick={saveDesign}
-            className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-all flex items-center gap-2 text-xs font-bold"
+            className="p-2 text-slate-500 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all flex items-center gap-2 text-xs font-bold"
             title="Lưu thiết kế hiện tại"
           >
             <Save size={18} />
@@ -336,7 +363,7 @@ export default function App() {
           </button>
           <button 
             onClick={loadDesign}
-            className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-all flex items-center gap-2 text-xs font-bold"
+            className="p-2 text-slate-500 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all flex items-center gap-2 text-xs font-bold"
             title="Tải thiết kế đã lưu"
           >
             <Download size={18} className="rotate-0" />
@@ -380,6 +407,13 @@ export default function App() {
               >
                 <ImageIcon size={20} />
                 Hình ảnh
+              </button>
+              <button 
+                onClick={() => setActiveTab('shapes')}
+                className={`flex-1 py-4 text-sm font-bold flex flex-col items-center gap-1 transition-all ${activeTab === 'shapes' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/30' : 'text-slate-400 hover:text-slate-600'}`}
+              >
+                <Square size={20} />
+                Hình vẽ
               </button>
             </div>
 
@@ -534,6 +568,58 @@ export default function App() {
                   </div>
 
                   <div className="space-y-4 pt-4 border-t border-slate-100">
+                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Tùy chỉnh Viền & Nét cắt</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5 col-span-2">
+                        <label className="text-xs font-bold text-slate-600">Độ dày viền thiết kế (mm)</label>
+                        <input 
+                          type="number" 
+                          step="0.1"
+                          min="0"
+                          value={dimensions.borderThickness}
+                          onChange={(e) => handleDimChange('borderThickness', Number(e.target.value))}
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-mono"
+                        />
+                      </div>
+                    </div>
+
+                    {dimensions.templateType === 'envelope' && (
+                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                        <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nét gạch ngang (Cắt)</h4>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase">Vị trí X (%)</label>
+                            <input 
+                              type="number" 
+                              value={dimensions.cutLineX}
+                              onChange={(e) => handleDimChange('cutLineX', Number(e.target.value))}
+                              className="w-full px-2 py-1.5 bg-white border border-slate-200 rounded outline-none text-xs font-mono"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase">Vị trí Y (%)</label>
+                            <input 
+                              type="number" 
+                              value={dimensions.cutLineY}
+                              onChange={(e) => handleDimChange('cutLineY', Number(e.target.value))}
+                              className="w-full px-2 py-1.5 bg-white border border-slate-200 rounded outline-none text-xs font-mono"
+                            />
+                          </div>
+                          <div className="space-y-1 col-span-2">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase">Chiều dài (mm)</label>
+                            <input 
+                              type="number" 
+                              value={dimensions.cutLineWidth}
+                              onChange={(e) => handleDimChange('cutLineWidth', Number(e.target.value))}
+                              className="w-full px-2 py-1.5 bg-white border border-slate-200 rounded outline-none text-xs font-mono"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-4 pt-4 border-t border-slate-100">
                     <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Ảnh mẫu (Trace)</h3>
                     <div className="space-y-2">
                       <input
@@ -546,7 +632,7 @@ export default function App() {
                       {!dimensions.guideImage ? (
                         <button
                           onClick={() => guideInputRef.current?.click()}
-                          className="w-full py-2 px-4 text-xs font-bold rounded-lg border border-dashed border-slate-300 text-slate-500 hover:border-rose-300 hover:text-rose-50 transition-all flex items-center justify-center gap-2"
+                          className="w-full py-2 px-4 text-xs font-bold rounded-lg border border-dashed border-slate-300 text-slate-500 hover:border-blue-300 hover:text-blue-600 transition-all flex items-center justify-center gap-2"
                         >
                           <ImageIcon size={14} />
                           Tải ảnh mẫu để đồ theo
@@ -554,7 +640,7 @@ export default function App() {
                       ) : (
                         <button
                           onClick={removeGuide}
-                          className="w-full py-2 px-4 text-xs font-bold rounded-lg border border-rose-200 text-rose-500 hover:bg-rose-50 transition-all flex items-center justify-center gap-2"
+                          className="w-full py-2 px-4 text-xs font-bold rounded-lg border border-blue-200 text-blue-500 hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
                         >
                           <Trash2 size={14} />
                           Xóa ảnh mẫu
@@ -583,7 +669,7 @@ export default function App() {
                         <textarea 
                           value={selectedElement.content}
                           onChange={(e) => updateElement(selectedId!, { content: e.target.value })}
-                          className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none min-h-[80px]"
+                          className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none min-h-[80px]"
                         />
                       </div>
                       <div className="space-y-1.5">
@@ -694,6 +780,95 @@ export default function App() {
                       >
                         <Trash2 size={16} />
                         Xóa phần tử
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'shapes' && (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-3 gap-2">
+                    <button onClick={() => addShape('rect')} className="p-3 bg-white border border-slate-200 rounded-xl hover:bg-blue-50 hover:border-blue-200 transition-all flex flex-col items-center gap-2">
+                      <Square size={20} />
+                      <span className="text-[10px] font-bold uppercase">Vuông</span>
+                    </button>
+                    <button onClick={() => addShape('circle')} className="p-3 bg-white border border-slate-200 rounded-xl hover:bg-blue-50 hover:border-blue-200 transition-all flex flex-col items-center gap-2">
+                      <Circle size={20} />
+                      <span className="text-[10px] font-bold uppercase">Tròn</span>
+                    </button>
+                    <button onClick={() => addShape('triangle')} className="p-3 bg-white border border-slate-200 rounded-xl hover:bg-blue-50 hover:border-blue-200 transition-all flex flex-col items-center gap-2">
+                      <Triangle size={20} />
+                      <span className="text-[10px] font-bold uppercase">Tam giác</span>
+                    </button>
+                    <button onClick={() => addShape('star')} className="p-3 bg-white border border-slate-200 rounded-xl hover:bg-blue-50 hover:border-blue-200 transition-all flex flex-col items-center gap-2">
+                      <Star size={20} />
+                      <span className="text-[10px] font-bold uppercase">Sao</span>
+                    </button>
+                    <button onClick={() => addShape('diamond')} className="p-3 bg-white border border-slate-200 rounded-xl hover:bg-blue-50 hover:border-blue-200 transition-all flex flex-col items-center gap-2">
+                      <Diamond size={20} />
+                      <span className="text-[10px] font-bold uppercase">Thoi</span>
+                    </button>
+                  </div>
+
+                  {selectedElement?.type === 'shape' && (
+                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-slate-600">Rộng (%)</label>
+                          <input 
+                            type="number" 
+                            value={selectedElement.width}
+                            onChange={(e) => updateElement(selectedId!, { width: Number(e.target.value) })}
+                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg outline-none"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-slate-600">Cao (%)</label>
+                          <input 
+                            type="number" 
+                            value={selectedElement.height}
+                            onChange={(e) => updateElement(selectedId!, { height: Number(e.target.value) })}
+                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg outline-none"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-slate-600">Màu nền</label>
+                          <input 
+                            type="color" 
+                            value={selectedElement.fillColor}
+                            onChange={(e) => updateElement(selectedId!, { fillColor: e.target.value })}
+                            className="w-full h-10 p-1 bg-white border border-slate-200 rounded-lg cursor-pointer"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-slate-600">Màu viền</label>
+                          <input 
+                            type="color" 
+                            value={selectedElement.borderColor}
+                            onChange={(e) => updateElement(selectedId!, { borderColor: e.target.value })}
+                            className="w-full h-10 p-1 bg-white border border-slate-200 rounded-lg cursor-pointer"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-600">Độ dày viền</label>
+                        <input 
+                          type="range" 
+                          min="0" max="10" step="0.5"
+                          value={selectedElement.borderWidth}
+                          onChange={(e) => updateElement(selectedId!, { borderWidth: Number(e.target.value) })}
+                          className="w-full accent-blue-600"
+                        />
+                      </div>
+                      <button 
+                        onClick={() => deleteElement(selectedId!)}
+                        className="w-full py-2 text-blue-600 font-bold text-sm flex items-center justify-center gap-2 hover:bg-blue-50 rounded-lg transition-all"
+                      >
+                        <Trash2 size={16} />
+                        Xóa hình vẽ
                       </button>
                     </div>
                   )}

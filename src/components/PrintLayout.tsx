@@ -149,7 +149,7 @@ export const PrintLayout: React.FC<Props> = ({ dimensions, elements, onBack }) =
         <div className="flex items-center gap-4">
           <button 
             onClick={onBack}
-            className="flex items-center gap-2 text-slate-600 hover:text-rose-600 font-bold text-sm transition-all"
+            className="flex items-center gap-2 text-slate-600 hover:text-blue-600 font-bold text-sm transition-all"
           >
             <ChevronLeft size={18} />
             Quay lại thiết kế
@@ -188,11 +188,11 @@ export const PrintLayout: React.FC<Props> = ({ dimensions, elements, onBack }) =
                 max="50"
                 value={autoCount}
                 onChange={(e) => setAutoCount(parseInt(e.target.value) || 1)}
-                className="w-12 h-7 bg-white border border-slate-200 rounded text-xs font-bold text-center focus:outline-none focus:ring-1 focus:ring-rose-500"
+                className="w-12 h-7 bg-white border border-slate-200 rounded text-xs font-bold text-center focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               <button 
                 onClick={() => autoLayout(autoCount)}
-                className="h-7 px-3 bg-rose-600 text-white rounded text-[10px] font-bold hover:bg-rose-700 transition-all flex items-center gap-1"
+                className="h-7 px-3 bg-blue-600 text-white rounded text-[10px] font-bold hover:bg-blue-700 transition-all flex items-center gap-1"
                 title="Tự động sắp xếp theo số lượng"
               >
                 <LayoutGrid size={12} />
@@ -255,7 +255,7 @@ export const PrintLayout: React.FC<Props> = ({ dimensions, elements, onBack }) =
                   e.stopPropagation();
                   setSelectedId(item.id);
                 }}
-                className={`group relative ${selectedId === item.id ? 'ring-2 ring-rose-500' : ''}`}
+                className={`group relative ${selectedId === item.id ? 'ring-2 ring-blue-500' : ''}`}
               >
                 <EnvelopeTemplate 
                   dimensions={dimensions} 
@@ -291,7 +291,7 @@ export const PrintLayout: React.FC<Props> = ({ dimensions, elements, onBack }) =
                     </button>
                     <button 
                       onClick={(e) => { e.stopPropagation(); deleteItem(item.id); }}
-                      className="p-1.5 hover:bg-rose-50 rounded text-rose-600"
+                      className="p-1.5 hover:bg-blue-50 rounded text-blue-600"
                       title="Xóa"
                     >
                       <Trash2 size={14} />

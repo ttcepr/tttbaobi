@@ -13,7 +13,10 @@ import {
   ChevronLeft,
   ChevronRight,
   LayoutGrid,
-  Download
+  Download,
+  ZoomIn,
+  ZoomOut,
+  Search
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { EnvelopeDimensions, DesignElement, FlapCorner } from './types';
@@ -44,6 +47,7 @@ export default function App() {
   const [showA4Ref, setShowA4Ref] = useState(false);
   const [show3D, setShow3D] = useState(false);
   const [zoom, setZoom] = useState(3);
+  const viewportRef = useRef<HTMLDivElement>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const guideInputRef = useRef<HTMLInputElement>(null);
@@ -154,6 +158,26 @@ export default function App() {
   const updateElement = (id: string, updates: Partial<DesignElement>) => {
     setElements(elements.map(el => el.id === id ? { ...el, ...updates } : el));
   };
+
+  const handleWheel = (e: WheelEvent) => {
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.2 : 0.2;
+      setZoom(prev => Math.min(10, Math.max(0.5, prev + delta)));
+    }
+  };
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (viewport) {
+      viewport.addEventListener('wheel', handleWheel, { passive: false });
+    }
+    return () => {
+      if (viewport) {
+        viewport.removeEventListener('wheel', handleWheel);
+      }
+    };
+  }, []);
 
   const deleteElement = (id: string) => {
     setElements(elements.filter(el => el.id !== id));
@@ -581,7 +605,10 @@ export default function App() {
         )}
 
         {/* Main Viewport */}
-        <div className="flex-1 relative overflow-auto bg-[#f1f3f5] flex items-center justify-center p-12">
+        <div 
+          ref={viewportRef}
+          className="flex-1 relative overflow-auto bg-[#f1f3f5] flex items-center justify-center p-12"
+        >
           <AnimatePresence mode="wait">
             {isPrinting ? (
               <motion.div 
@@ -646,15 +673,32 @@ export default function App() {
                   <label htmlFor="a4ref" className="text-[10px] font-black text-slate-400 uppercase tracking-widest cursor-pointer">Khung A4</label>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Phóng to:</span>
-                  <input 
-                    type="range" 
-                    min="1" max="10" step="0.5"
-                    value={zoom}
-                    onChange={(e) => setZoom(Number(e.target.value))}
-                    className="w-24 accent-rose-600"
-                  />
-                  <span className="text-[10px] font-bold text-slate-600 w-8">{zoom}x</span>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                    <Search size={12} />
+                    Phóng to:
+                  </span>
+                  <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
+                    <button 
+                      onClick={() => setZoom(prev => Math.max(0.5, prev - 0.5))}
+                      className="p-1 hover:bg-white rounded shadow-sm text-slate-600 transition-all"
+                    >
+                      <ZoomOut size={14} />
+                    </button>
+                    <input 
+                      type="range" 
+                      min="0.5" max="10" step="0.5"
+                      value={zoom}
+                      onChange={(e) => setZoom(Number(e.target.value))}
+                      className="w-20 accent-rose-600 h-1.5"
+                    />
+                    <button 
+                      onClick={() => setZoom(prev => Math.min(10, prev + 0.5))}
+                      className="p-1 hover:bg-white rounded shadow-sm text-slate-600 transition-all"
+                    >
+                      <ZoomIn size={14} />
+                    </button>
+                  </div>
+                  <span className="text-[10px] font-bold text-slate-600 w-10 text-center">{Math.round(zoom * 100)}%</span>
                 </div>
               </div>
               <div className="px-4 py-2 border-r border-slate-200">

@@ -34,8 +34,8 @@ import { PrintLayout } from './components/PrintLayout';
 import { Box3D } from './components/Box3D';
 
 const INITIAL_DIMENSIONS: EnvelopeDimensions = {
-  width: 210,
-  height: 297,
+  width: 50,
+  height: 50,
   depth: 40,
   flapTopHeight: 30,
   flapBottomHeight: 15,
@@ -44,6 +44,11 @@ const INITIAL_DIMENSIONS: EnvelopeDimensions = {
   bottomFlapType: 'diagonal',
   sideFlapType: 'diagonal',
   templateType: 'custom',
+  templateName: 'Mẫu bao bì mới',
+  customerName: '',
+  customerPhone: '',
+  customerAddress: '',
+  quantity: 1,
   borderThickness: 0.5,
   cutLineX: 50,
   cutLineY: 15,
@@ -88,7 +93,8 @@ export default function App() {
   ];
 
   const PRESETS = [
-    { name: 'Khổ A4 (Mặc định)', w: 210, h: 297 },
+    { name: 'Khổ 50x50 (Mặc định)', w: 50, h: 50 },
+    { name: 'Khổ A4', w: 210, h: 297 },
   ];
 
   const handleDimChange = (key: keyof EnvelopeDimensions, value: any) => {
@@ -434,8 +440,66 @@ export default function App() {
               {activeTab === 'dims' && (
                 <div className="space-y-6">
                   <div className="space-y-4">
-                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Loại sản phẩm</h3>
+                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Thông tin khách hàng</h3>
+                    <div className="space-y-3">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Tên khách hàng</label>
+                        <input 
+                          type="text" 
+                          value={dimensions.customerName || ''}
+                          onChange={(e) => handleDimChange('customerName', e.target.value)}
+                          placeholder="Nhập tên khách hàng..."
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Số điện thoại</label>
+                        <input 
+                          type="text" 
+                          value={dimensions.customerPhone || ''}
+                          onChange={(e) => handleDimChange('customerPhone', e.target.value)}
+                          placeholder="Nhập số điện thoại..."
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Địa chỉ</label>
+                        <input 
+                          type="text" 
+                          value={dimensions.customerAddress || ''}
+                          onChange={(e) => handleDimChange('customerAddress', e.target.value)}
+                          placeholder="Nhập địa chỉ..."
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Loại sản phẩm & Số lượng</h3>
+                    <div className="space-y-3">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Tên loại mẫu (Thủ công)</label>
+                        <input 
+                          type="text" 
+                          value={dimensions.templateName || ''}
+                          onChange={(e) => handleDimChange('templateName', e.target.value)}
+                          placeholder="Nhập tên loại mẫu..."
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Số lượng đặt in</label>
+                        <input 
+                          type="number" 
+                          value={dimensions.quantity || 1}
+                          onChange={(e) => handleDimChange('quantity', Number(e.target.value))}
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                    </div>
                     <div className="grid grid-cols-1 gap-2">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase">Cấu trúc mẫu (Logic)</label>
                       {TEMPLATES.map((t) => (
                         <button
                           key={t.id}

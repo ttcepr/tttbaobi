@@ -337,6 +337,36 @@ export const PrintLayout: React.FC<Props> = ({ dimensions, elements, onBack }) =
           {/* Grid helper */}
           <div className="absolute inset-0 pointer-events-none opacity-[0.03] no-print" 
                style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 0)', backgroundSize: '10mm 10mm' }} />
+
+          {/* Technical Data Block at the bottom of the page */}
+          <div className="absolute bottom-4 left-4 right-4 border border-slate-400 p-3 flex flex-col gap-2 text-[9px] font-mono text-slate-800 bg-white/50 z-[100]">
+            <div className="flex justify-between border-b border-slate-200 pb-1">
+              <span className="font-bold uppercase tracking-wider">Bảng thông số kỹ thuật (Technical Data Sheet)</span>
+              <span>Ngày in: {new Date().toLocaleDateString('vi-VN')}</span>
+            </div>
+            
+            {/* Customer Info Row */}
+            <div className="grid grid-cols-3 gap-4 border-b border-slate-100 pb-1">
+              <div className="flex gap-2"><span>Khách hàng:</span> <span className="font-bold">{dimensions.customerName || 'N/A'}</span></div>
+              <div className="flex gap-2"><span>SĐT:</span> <span className="font-bold">{dimensions.customerPhone || 'N/A'}</span></div>
+              <div className="flex gap-2"><span>Địa chỉ:</span> <span className="font-bold truncate">{dimensions.customerAddress || 'N/A'}</span></div>
+            </div>
+
+            <div className="grid grid-cols-4 gap-x-4 gap-y-1">
+              <div className="flex justify-between">
+                <span>Loại mẫu:</span> 
+                <span className="font-bold">{dimensions.templateName || 'Tùy chỉnh'}</span>
+              </div>
+              <div className="flex justify-between"><span>Số lượng:</span> <span className="font-bold">{dimensions.quantity || 1}</span></div>
+              <div className="flex justify-between"><span>Chiều rộng (W):</span> <span className="font-bold">{dimensions.width} mm</span></div>
+              <div className="flex justify-between"><span>Chiều cao (H):</span> <span className="font-bold">{dimensions.height} mm</span></div>
+              {dimensions.depth && <div className="flex justify-between"><span>Chiều sâu (D):</span> <span className="font-bold">{dimensions.depth} mm</span></div>}
+              <div className="flex justify-between"><span>Nắp trên (TF):</span> <span className="font-bold">{dimensions.flapTopHeight} mm</span></div>
+              <div className="flex justify-between"><span>Nắp dưới (BF):</span> <span className="font-bold">{dimensions.flapBottomHeight} mm</span></div>
+              <div className="flex justify-between"><span>Tai dán (SF):</span> <span className="font-bold">{dimensions.flapSideWidth} mm</span></div>
+              <div className="flex justify-between"><span>Nét vẽ:</span> <span className="font-bold">{dimensions.borderThickness} mm</span></div>
+            </div>
+          </div>
         </div>
       </div>
 

@@ -14,6 +14,11 @@ export interface EnvelopeDimensions {
   bottomFlapType: FlapCorner;
   sideFlapType: FlapCorner;
   templateType: TemplateType;
+  templateName?: string; // Tên loại mẫu nhập thủ công
+  customerName?: string; // Tên khách hàng
+  customerPhone?: string; // Số điện thoại
+  customerAddress?: string; // Địa chỉ
+  quantity?: number; // Số lượng
   guideImage?: string;
   borderThickness?: number; // Độ dày viền thiết kế
   cutLineX?: number; // Tọa độ X nét cắt (%)

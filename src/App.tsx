@@ -16,7 +16,10 @@ import {
   Download,
   ZoomIn,
   ZoomOut,
-  Search
+  Search,
+  Lock,
+  User,
+  LogIn
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { EnvelopeDimensions, DesignElement, FlapCorner } from './types';
@@ -46,7 +49,9 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'dims' | 'text' | 'image'>('dims');
   const [showA4Ref, setShowA4Ref] = useState(false);
   const [show3D, setShow3D] = useState(false);
-  const [zoom, setZoom] = useState(3);
+  const [zoom, setZoom] = useState(1);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loginData, setLoginData] = useState({ username: '', password: '' });
   const viewportRef = useRef<HTMLDivElement>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -160,11 +165,10 @@ export default function App() {
   };
 
   const handleWheel = (e: WheelEvent) => {
-    if (e.ctrlKey || e.metaKey) {
-      e.preventDefault();
-      const delta = e.deltaY > 0 ? -0.2 : 0.2;
-      setZoom(prev => Math.min(10, Math.max(0.5, prev + delta)));
-    }
+    // Zoom with wheel
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.1 : 0.1;
+    setZoom(prev => Math.min(10, Math.max(0.5, prev + delta)));
   };
 
   useEffect(() => {
@@ -184,23 +188,144 @@ export default function App() {
     setSelectedId(null);
   };
 
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (loginData.username === 'admin' && loginData.password === 'thai1991') {
+      setIsLoggedIn(true);
+    } else {
+      alert('Sai tài khoản hoặc mật khẩu!');
+    }
+  };
+
   const selectedElement = elements.find(el => el.id === selectedId);
+
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-sans">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden border border-white"
+        >
+          <div className="bg-blue-600 p-8 text-white text-center">
+            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-md">
+              <Lock size={32} />
+            </div>
+            <h2 className="text-2xl font-black uppercase tracking-tight">Đăng nhập hệ thống</h2>
+            <p className="text-blue-100 text-sm mt-2 font-medium">TTT Thiết kế bao bì chuyên nghiệp</p>
+          </div>
+          <form onSubmit={handleLogin} className="p-8 space-y-6">
+            <div className="space-y-2">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Tài khoản</label>
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input 
+                  type="text" 
+                  required
+                  value={loginData.username}
+                  onChange={(e) => setLoginData(prev => ({ ...prev, username: e.target.value }))}
+                  className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-bold"
+                  placeholder="Nhập username"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Mật khẩu</label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input 
+                  type="password" 
+                  required
+                  value={loginData.password}
+                  onChange={(e) => setLoginData(prev => ({ ...prev, password: e.target.value }))}
+                  className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-bold"
+                  placeholder="Nhập password"
+                />
+              </div>
+            </div>
+            <button 
+              type="submit"
+              className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-2 group"
+            >
+              Vào hệ thống
+              <LogIn size={20} className="group-hover:translate-x-1 transition-transform" />
+            </button>
+            <div className="pt-4 text-center border-t border-slate-100">
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Hotline: 033.6868.332 - Satoh Thái</p>
+            </div>
+          </form>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] flex flex-col font-sans text-slate-900">
       {/* Header */}
       <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-50">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-rose-200">
+          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
             <LayoutGrid size={24} />
           </div>
           <div>
-            <h1 className="font-bold text-lg leading-tight">Thiết kế Bao bì Pro</h1>
-            <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Bao Lì Xì & Phong bì</p>
+            <h1 className="font-bold text-lg leading-tight">Thiết kế Bao bì Pro - 033.6868.332 - Satoh Thái</h1>
+            <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Bao Lì Xì & Phong bì chuyên nghiệp</p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Zoom & A4 Controls in Header */}
+          {!isPrinting && (
+            <div className="flex items-center gap-4 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100 mr-2">
+              <div className="flex items-center gap-2 border-r border-slate-200 pr-3">
+                <input 
+                  type="checkbox" 
+                  id="a4ref-header" 
+                  checked={showA4Ref} 
+                  onChange={(e) => setShowA4Ref(e.target.checked)}
+                  className="accent-blue-600"
+                />
+                <label htmlFor="a4ref-header" className="text-[10px] font-black text-slate-400 uppercase tracking-widest cursor-pointer">Khung A4</label>
+              </div>
+
+              <div className="flex items-center gap-2 border-r border-slate-200 pr-3">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                  <Search size={12} />
+                  Zoom:
+                </span>
+                <div className="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-slate-200">
+                  <button 
+                    onClick={() => setZoom(prev => Math.max(0.5, prev - 0.1))}
+                    className="p-1 hover:bg-slate-100 rounded text-slate-600 transition-all"
+                  >
+                    <ZoomOut size={14} />
+                  </button>
+                  <span className="text-[10px] font-bold text-slate-600 w-10 text-center">{Math.round(zoom * 100)}%</span>
+                  <button 
+                    onClick={() => setZoom(prev => Math.min(10, prev + 0.1))}
+                    className="p-1 hover:bg-slate-100 rounded text-slate-600 transition-all"
+                  >
+                    <ZoomIn size={14} />
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex flex-col">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">Kích thước tổng</span>
+                <span className="text-[11px] font-bold text-slate-700 leading-none">
+                  {dimensions.templateType === 'box' 
+                    ? (dimensions.flapSideWidth + dimensions.width * 2 + dimensions.depth * 2).toFixed(0)
+                    : dimensions.templateType === 'fold3'
+                    ? (dimensions.width * 3).toFixed(0)
+                    : (dimensions.width * 2 + dimensions.flapSideWidth).toFixed(0)
+                  } x {
+                    (dimensions.height + dimensions.flapTopHeight + dimensions.flapBottomHeight).toFixed(0)
+                  } mm
+                </span>
+              </div>
+            </div>
+          )}
+
           <button 
             onClick={saveDesign}
             className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-all flex items-center gap-2 text-xs font-bold"
@@ -221,7 +346,7 @@ export default function App() {
           {!isPrinting && (
             <button 
               onClick={() => setIsPrinting(true)}
-              className="flex items-center gap-2 px-6 py-2 bg-rose-600 text-white rounded-lg font-bold hover:bg-rose-700 transition-all shadow-lg shadow-rose-200"
+              className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
             >
               Tiếp theo
               <ChevronRight size={18} />
@@ -237,21 +362,21 @@ export default function App() {
             <div className="flex border-b border-slate-100">
               <button 
                 onClick={() => setActiveTab('dims')}
-                className={`flex-1 py-4 text-sm font-bold flex flex-col items-center gap-1 transition-all ${activeTab === 'dims' ? 'text-rose-600 border-b-2 border-rose-600 bg-rose-50/30' : 'text-slate-400 hover:text-slate-600'}`}
+                className={`flex-1 py-4 text-sm font-bold flex flex-col items-center gap-1 transition-all ${activeTab === 'dims' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/30' : 'text-slate-400 hover:text-slate-600'}`}
               >
                 <Settings size={20} />
                 Kích thước
               </button>
               <button 
                 onClick={() => setActiveTab('text')}
-                className={`flex-1 py-4 text-sm font-bold flex flex-col items-center gap-1 transition-all ${activeTab === 'text' ? 'text-rose-600 border-b-2 border-rose-600 bg-rose-50/30' : 'text-slate-400 hover:text-slate-600'}`}
+                className={`flex-1 py-4 text-sm font-bold flex flex-col items-center gap-1 transition-all ${activeTab === 'text' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/30' : 'text-slate-400 hover:text-slate-600'}`}
               >
                 <Type size={20} />
                 Văn bản
               </button>
               <button 
                 onClick={() => setActiveTab('image')}
-                className={`flex-1 py-4 text-sm font-bold flex flex-col items-center gap-1 transition-all ${activeTab === 'image' ? 'text-rose-600 border-b-2 border-rose-600 bg-rose-50/30' : 'text-slate-400 hover:text-slate-600'}`}
+                className={`flex-1 py-4 text-sm font-bold flex flex-col items-center gap-1 transition-all ${activeTab === 'image' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/30' : 'text-slate-400 hover:text-slate-600'}`}
               >
                 <ImageIcon size={20} />
                 Hình ảnh
@@ -270,8 +395,8 @@ export default function App() {
                           onClick={() => handleDimChange('templateType', t.id)}
                           className={`w-full py-2 px-4 text-xs font-bold rounded-lg border text-left transition-all ${
                             dimensions.templateType === t.id 
-                            ? 'bg-rose-600 border-rose-600 text-white shadow-md' 
-                            : 'bg-white border-slate-200 text-slate-600 hover:border-rose-300'
+                            ? 'bg-blue-600 border-blue-600 text-white shadow-md' 
+                            : 'bg-white border-slate-200 text-slate-600 hover:border-blue-300'
                           }`}
                         >
                           {t.name}
@@ -289,7 +414,7 @@ export default function App() {
                           type="number" 
                           value={dimensions.width}
                           onChange={(e) => handleDimChange('width', Number(e.target.value))}
-                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all font-mono"
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-mono"
                         />
                       </div>
                       <div className="space-y-1.5">
@@ -298,7 +423,7 @@ export default function App() {
                           type="number" 
                           value={dimensions.height}
                           onChange={(e) => handleDimChange('height', Number(e.target.value))}
-                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all font-mono"
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-mono"
                         />
                       </div>
                       {dimensions.templateType === 'box' && (
@@ -308,7 +433,7 @@ export default function App() {
                             type="number" 
                             value={dimensions.depth}
                             onChange={(e) => handleDimChange('depth', Number(e.target.value))}
-                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all font-mono"
+                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-mono"
                           />
                         </div>
                       )}
@@ -324,7 +449,7 @@ export default function App() {
                           type="number" 
                           value={dimensions.flapTopHeight}
                           onChange={(e) => handleDimChange('flapTopHeight', Number(e.target.value))}
-                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all font-mono"
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-mono"
                         />
                       </div>
                       <div className="space-y-1.5">
@@ -333,7 +458,7 @@ export default function App() {
                           type="number" 
                           value={dimensions.flapBottomHeight}
                           onChange={(e) => handleDimChange('flapBottomHeight', Number(e.target.value))}
-                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all font-mono"
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-mono"
                         />
                       </div>
                       <div className="space-y-1.5">
@@ -342,7 +467,7 @@ export default function App() {
                           type="number" 
                           value={dimensions.flapSideWidth}
                           onChange={(e) => handleDimChange('flapSideWidth', Number(e.target.value))}
-                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all font-mono"
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-mono"
                         />
                       </div>
                     </div>
@@ -360,7 +485,7 @@ export default function App() {
                               onClick={() => handleDimChange('topFlapType', type)}
                               className={`flex-1 py-1 text-[10px] font-bold rounded border transition-all ${
                                 dimensions.topFlapType === type 
-                                ? 'bg-rose-600 border-rose-600 text-white' 
+                                ? 'bg-blue-600 border-blue-600 text-white' 
                                 : 'bg-white border-slate-200 text-slate-600'
                               }`}
                             >
@@ -378,7 +503,7 @@ export default function App() {
                               onClick={() => handleDimChange('bottomFlapType', type)}
                               className={`flex-1 py-1 text-[10px] font-bold rounded border transition-all ${
                                 dimensions.bottomFlapType === type 
-                                ? 'bg-rose-600 border-rose-600 text-white' 
+                                ? 'bg-blue-600 border-blue-600 text-white' 
                                 : 'bg-white border-slate-200 text-slate-600'
                               }`}
                             >
@@ -396,7 +521,7 @@ export default function App() {
                               onClick={() => handleDimChange('sideFlapType', type)}
                               className={`flex-1 py-1 text-[10px] font-bold rounded border transition-all ${
                                 dimensions.sideFlapType === type 
-                                ? 'bg-rose-600 border-rose-600 text-white' 
+                                ? 'bg-blue-600 border-blue-600 text-white' 
                                 : 'bg-white border-slate-200 text-slate-600'
                               }`}
                             >
@@ -514,7 +639,7 @@ export default function App() {
                       </div>
                       <button 
                         onClick={() => deleteElement(selectedId!)}
-                        className="w-full py-2 text-rose-600 font-bold text-sm flex items-center justify-center gap-2 hover:bg-rose-50 rounded-lg transition-all"
+                        className="w-full py-2 text-blue-600 font-bold text-sm flex items-center justify-center gap-2 hover:bg-blue-50 rounded-lg transition-all"
                       >
                         <Trash2 size={16} />
                         Xóa phần tử
@@ -528,7 +653,7 @@ export default function App() {
                 <div className="space-y-6">
                   <button 
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full py-3 bg-slate-900 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-lg"
+                    className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-800 transition-all shadow-lg shadow-blue-100"
                   >
                     <Plus size={18} />
                     Tải ảnh lên
@@ -550,7 +675,7 @@ export default function App() {
                           min="5" max="100"
                           value={selectedElement.width}
                           onChange={(e) => updateElement(selectedId!, { width: Number(e.target.value) })}
-                          className="w-full accent-rose-600"
+                          className="w-full accent-blue-600"
                         />
                       </div>
                       <div className="space-y-1.5">
@@ -560,12 +685,12 @@ export default function App() {
                           min="0" max="360"
                           value={selectedElement.rotation}
                           onChange={(e) => updateElement(selectedId!, { rotation: Number(e.target.value) })}
-                          className="w-full accent-rose-600"
+                          className="w-full accent-blue-600"
                         />
                       </div>
                       <button 
                         onClick={() => deleteElement(selectedId!)}
-                        className="w-full py-2 text-rose-600 font-bold text-sm flex items-center justify-center gap-2 hover:bg-rose-50 rounded-lg transition-all"
+                        className="w-full py-2 text-blue-600 font-bold text-sm flex items-center justify-center gap-2 hover:bg-blue-50 rounded-lg transition-all"
                       >
                         <Trash2 size={16} />
                         Xóa phần tử
@@ -658,59 +783,13 @@ export default function App() {
             )}
           </AnimatePresence>
 
-          {/* Floating Controls for Editor */}
+          {/* Floating Controls for Editor - REMOVED and moved to header */}
           {!isPrinting && (
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white/80 backdrop-blur-md p-2 rounded-2xl shadow-2xl border border-white/50">
-              <div className="px-4 py-2 border-r border-slate-200 flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <input 
-                    type="checkbox" 
-                    id="a4ref" 
-                    checked={showA4Ref} 
-                    onChange={(e) => setShowA4Ref(e.target.checked)}
-                    className="accent-rose-600"
-                  />
-                  <label htmlFor="a4ref" className="text-[10px] font-black text-slate-400 uppercase tracking-widest cursor-pointer">Khung A4</label>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
-                    <Search size={12} />
-                    Phóng to:
-                  </span>
-                  <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
-                    <button 
-                      onClick={() => setZoom(prev => Math.max(0.5, prev - 0.5))}
-                      className="p-1 hover:bg-white rounded shadow-sm text-slate-600 transition-all"
-                    >
-                      <ZoomOut size={14} />
-                    </button>
-                    <input 
-                      type="range" 
-                      min="0.5" max="10" step="0.5"
-                      value={zoom}
-                      onChange={(e) => setZoom(Number(e.target.value))}
-                      className="w-20 accent-rose-600 h-1.5"
-                    />
-                    <button 
-                      onClick={() => setZoom(prev => Math.min(10, prev + 0.5))}
-                      className="p-1 hover:bg-white rounded shadow-sm text-slate-600 transition-all"
-                    >
-                      <ZoomIn size={14} />
-                    </button>
-                  </div>
-                  <span className="text-[10px] font-bold text-slate-600 w-10 text-center">{Math.round(zoom * 100)}%</span>
-                </div>
-              </div>
-              <div className="px-4 py-2 border-r border-slate-200">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Kích thước tổng</p>
-                <p className="text-sm font-bold text-slate-700">
-                  {(dimensions.width * 2 + dimensions.flapSideWidth).toFixed(0)} x {(dimensions.height + dimensions.flapTopHeight + dimensions.flapBottomHeight).toFixed(0)} mm
-                </p>
-              </div>
+            <div className="absolute bottom-8 right-8 flex flex-col gap-2">
               {dimensions.templateType === 'box' && (
                 <button 
                   onClick={() => setShow3D(!show3D)}
-                  className={`p-3 rounded-xl transition-all flex items-center gap-2 ${show3D ? 'bg-rose-600 text-white' : 'text-slate-400 hover:text-rose-600 hover:bg-rose-50'}`}
+                  className={`p-3 rounded-xl shadow-xl border transition-all flex items-center gap-2 ${show3D ? 'bg-blue-600 text-white border-blue-700' : 'bg-white text-slate-400 hover:text-blue-600 hover:bg-blue-50 border-slate-200'}`}
                   title="Xem mô hình 3D"
                 >
                   <Maximize size={20} />
@@ -719,16 +798,10 @@ export default function App() {
               )}
               <button 
                 onClick={() => setElements([])}
-                className="p-3 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+                className="p-3 bg-white text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl shadow-xl border border-slate-200 transition-all"
                 title="Xóa tất cả thiết kế"
               >
                 <Trash2 size={20} />
-              </button>
-              <button 
-                className="p-3 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
-                title="Lưu bản nháp"
-              >
-                <Save size={20} />
               </button>
             </div>
           )}

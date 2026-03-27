@@ -220,17 +220,17 @@ export const EnvelopeTemplate: React.FC<Props> = ({
       {/* Template Rendering */}
       {templateType === 'envelope' && (
         <>
-          <rect x={frontX} y={frontY} width={width} height={height} fill="none" stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
-          <rect x={backX} y={backY} width={width} height={height} fill="none" stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
-          <line x1={backX + width * 0.2} y1={backY + height * 0.15} x2={backX + width * 0.8} y2={backY + height * 0.15} stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
+          <rect x={frontX} y={frontY} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+          <rect x={backX} y={backY} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+          <line x1={backX + width * 0.2} y1={backY + height * 0.15} x2={backX + width * 0.8} y2={backY + height * 0.15} stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
           <g transform={`translate(${topFlapX}, ${topFlapY})`}>
-            <path d={getFlapPath(width, flapTopHeight, topFlapType, 'top')} fill="none" stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
+            <path d={getFlapPath(width, flapTopHeight, topFlapType, 'top')} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
           </g>
           <g transform={`translate(${bottomFlapX}, ${bottomFlapY})`}>
-            <path d={getFlapPath(width, flapBottomHeight, bottomFlapType, 'bottom')} fill="none" stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
+            <path d={getFlapPath(width, flapBottomHeight, bottomFlapType, 'bottom')} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
           </g>
           <g transform={`translate(${glueX}, ${glueY})`}>
-            <path d={getFlapPath(flapSideWidth, height, sideFlapType, 'side')} fill="none" stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
+            <path d={getFlapPath(flapSideWidth, height, sideFlapType, 'side')} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
           </g>
         </>
       )}
@@ -238,62 +238,62 @@ export const EnvelopeTemplate: React.FC<Props> = ({
       {templateType === 'box' && (
         <>
           {/* Glue Flap */}
-          <path d={`M ${padding} ${frontY + height * 0.1} L ${padding + flapSideWidth} ${frontY} L ${padding + flapSideWidth} ${frontY + height} L ${padding} ${frontY + height * 0.9} Z`} fill="none" stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
+          <path d={`M ${padding} ${frontY + height * 0.1} L ${padding + flapSideWidth} ${frontY} L ${padding + flapSideWidth} ${frontY + height} L ${padding} ${frontY + height * 0.9} Z`} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
           
           {/* Back Panel */}
-          <rect x={padding + flapSideWidth} y={frontY} width={width} height={height} fill="none" stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
+          <rect x={padding + flapSideWidth} y={frontY} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
           
           {/* Side Panel 1 */}
-          <rect x={padding + flapSideWidth + width} y={frontY} width={depth} height={height} fill="none" stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
+          <rect x={padding + flapSideWidth + width} y={frontY} width={depth} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
           
           {/* Front Panel */}
-          <rect x={padding + flapSideWidth + width + depth} y={frontY} width={width} height={height} fill="none" stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
+          <rect x={padding + flapSideWidth + width + depth} y={frontY} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
           
           {/* Side Panel 2 */}
-          <rect x={padding + flapSideWidth + width * 2 + depth} y={frontY} width={depth} height={height} fill="none" stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
+          <rect x={padding + flapSideWidth + width * 2 + depth} y={frontY} width={depth} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
 
           {/* Top Flaps (on Back and Front) */}
           {/* Top Flap Back */}
           <g transform={`translate(${padding + flapSideWidth}, ${padding})`}>
-            <path d={getFlapPath(width, flapTopHeight, topFlapType, 'top')} fill="none" stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
+            <path d={getFlapPath(width, flapTopHeight, topFlapType, 'top')} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
           </g>
           {/* Top Flap Front */}
           <g transform={`translate(${padding + flapSideWidth + width + depth}, ${padding})`}>
-            <path d={getFlapPath(width, flapTopHeight, topFlapType, 'top')} fill="none" stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
+            <path d={getFlapPath(width, flapTopHeight, topFlapType, 'top')} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
           </g>
 
           {/* Bottom Flaps (on Back and Front) */}
           {/* Bottom Flap Back */}
           <g transform={`translate(${padding + flapSideWidth}, ${frontY + height})`}>
-            <path d={getFlapPath(width, flapBottomHeight, bottomFlapType, 'bottom')} fill="none" stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
+            <path d={getFlapPath(width, flapBottomHeight, bottomFlapType, 'bottom')} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
           </g>
           {/* Bottom Flap Front */}
           <g transform={`translate(${padding + flapSideWidth + width + depth}, ${frontY + height})`}>
-            <path d={getFlapPath(width, flapBottomHeight, bottomFlapType, 'bottom')} fill="none" stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
+            <path d={getFlapPath(width, flapBottomHeight, bottomFlapType, 'bottom')} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
           </g>
 
           {/* Dust Flaps (on Sides) */}
           <g transform={`translate(${padding + flapSideWidth + width}, ${frontY})`}>
-             <path d={`M 0 0 L ${depth} 0 L ${depth * 0.8} ${-flapTopHeight * 0.6} L ${depth * 0.2} ${-flapTopHeight * 0.6} Z`} fill="none" stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
-             <path d={`M 0 ${height} L ${depth} ${height} L ${depth * 0.8} ${height + flapBottomHeight * 0.6} L ${depth * 0.2} ${height + flapBottomHeight * 0.6} Z`} fill="none" stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
+             <path d={`M 0 0 L ${depth} 0 L ${depth * 0.8} ${-flapTopHeight * 0.6} L ${depth * 0.2} ${-flapTopHeight * 0.6} Z`} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+             <path d={`M 0 ${height} L ${depth} ${height} L ${depth * 0.8} ${height + flapBottomHeight * 0.6} L ${depth * 0.2} ${height + flapBottomHeight * 0.6} Z`} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
           </g>
           <g transform={`translate(${padding + flapSideWidth + width * 2 + depth}, ${frontY})`}>
-             <path d={`M 0 0 L ${depth} 0 L ${depth * 0.8} ${-flapTopHeight * 0.6} L ${depth * 0.2} ${-flapTopHeight * 0.6} Z`} fill="none" stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
-             <path d={`M 0 ${height} L ${depth} ${height} L ${depth * 0.8} ${height + flapBottomHeight * 0.6} L ${depth * 0.2} ${height + flapBottomHeight * 0.6} Z`} fill="none" stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
+             <path d={`M 0 0 L ${depth} 0 L ${depth * 0.8} ${-flapTopHeight * 0.6} L ${depth * 0.2} ${-flapTopHeight * 0.6} Z`} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+             <path d={`M 0 ${height} L ${depth} ${height} L ${depth * 0.8} ${height + flapBottomHeight * 0.6} L ${depth * 0.2} ${height + flapBottomHeight * 0.6} Z`} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
           </g>
         </>
       )}
 
       {templateType === 'fold3' && (
         <>
-          <rect x={padding} y={padding} width={width} height={height} fill="none" stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
-          <rect x={padding + width} y={padding} width={width} height={height} fill="none" stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
-          <rect x={padding + width * 2} y={padding} width={width} height={height} fill="none" stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
+          <rect x={padding} y={padding} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+          <rect x={padding + width} y={padding} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
+          <rect x={padding + width * 2} y={padding} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
         </>
       )}
 
       {templateType === 'invitation' && (
-        <rect x={padding} y={padding} width={width} height={height} fill="none" stroke={showCutLines ? "#e11d48" : "none"} strokeWidth="0.5" />
+        <rect x={padding} y={padding} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth="0.5" />
       )}
 
       {/* Fold Lines */}

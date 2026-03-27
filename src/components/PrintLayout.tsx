@@ -35,8 +35,14 @@ export const PrintLayout: React.FC<Props> = ({ dimensions, elements, onBack }) =
 
   const templateWidth = dimensions.templateType === 'box' 
     ? dimensions.width * 2 + dimensions.depth * 2 + dimensions.flapSideWidth
+    : dimensions.templateType === 'fold3'
+    ? dimensions.width * 3
+    : dimensions.templateType === 'invitation' || dimensions.templateType === 'custom'
+    ? dimensions.width
     : dimensions.width * 2 + dimensions.flapSideWidth;
-  const templateHeight = dimensions.height + dimensions.flapTopHeight + dimensions.flapBottomHeight;
+  const templateHeight = dimensions.templateType === 'invitation' || dimensions.templateType === 'custom' || dimensions.templateType === 'fold3'
+    ? dimensions.height
+    : dimensions.height + dimensions.flapTopHeight + dimensions.flapBottomHeight;
 
   // Auto layout logic
   const autoLayout = (count?: number) => {

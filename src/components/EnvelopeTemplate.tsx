@@ -56,7 +56,7 @@ export const EnvelopeTemplate: React.FC<Props> = ({
   if (templateType === 'fold3') {
     totalWidth = width * 3;
     totalHeight = height;
-  } else if (templateType === 'invitation') {
+  } else if (templateType === 'invitation' || templateType === 'custom') {
     totalWidth = width;
     totalHeight = height;
   } else if (templateType === 'box') {
@@ -74,7 +74,7 @@ export const EnvelopeTemplate: React.FC<Props> = ({
   let frontX = padding + width;
   let frontY = padding + flapTopHeight;
 
-  if (templateType === 'fold3' || templateType === 'invitation') {
+  if (templateType === 'fold3' || templateType === 'invitation' || templateType === 'custom') {
     frontX = padding;
     frontY = padding;
   } else if (templateType === 'box') {
@@ -217,6 +217,18 @@ export const EnvelopeTemplate: React.FC<Props> = ({
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     >
+      {/* Background Color */}
+      {dimensions.backgroundColor && (
+        <rect 
+          x={padding} 
+          y={padding} 
+          width={totalWidth} 
+          height={totalHeight} 
+          fill={dimensions.backgroundColor} 
+          style={{ pointerEvents: 'none' }}
+        />
+      )}
+
       {/* Guide Image Background (Trace) */}
       {dimensions.guideImage && (
         <image 
@@ -326,7 +338,7 @@ export const EnvelopeTemplate: React.FC<Props> = ({
         </>
       )}
 
-      {templateType === 'invitation' && (
+      {(templateType === 'invitation' || templateType === 'custom') && (
         <rect x={padding} y={padding} width={width} height={height} fill="none" stroke={showCutLines ? "#000000" : "none"} strokeWidth={borderThickness} />
       )}
 

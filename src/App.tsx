@@ -84,6 +84,15 @@ export default function App() {
     { id: 'box', name: 'Hộp giấy / Carton' },
     { id: 'fold3', name: 'Thiệp gấp 3' },
     { id: 'invitation', name: 'Thiệp mời đơn' },
+    { id: 'custom', name: 'Khổ tự do (Tùy chọn)' },
+  ];
+
+  const PRESETS = [
+    { name: 'A4', w: 210, h: 297 },
+    { name: 'A3', w: 297, h: 420 },
+    { name: 'Banner (1m)', w: 1000, h: 300 },
+    { name: 'Banner (2m)', w: 2000, h: 500 },
+    { name: 'Khổ lớn (2.5m)', w: 2500, h: 2500 },
   ];
 
   const handleDimChange = (key: keyof EnvelopeDimensions, value: any) => {
@@ -344,9 +353,13 @@ export default function App() {
                     ? (dimensions.flapSideWidth + dimensions.width * 2 + dimensions.depth * 2).toFixed(0)
                     : dimensions.templateType === 'fold3'
                     ? (dimensions.width * 3).toFixed(0)
+                    : dimensions.templateType === 'invitation' || dimensions.templateType === 'custom'
+                    ? dimensions.width.toFixed(0)
                     : (dimensions.width * 2 + dimensions.flapSideWidth).toFixed(0)
                   } x {
-                    (dimensions.height + dimensions.flapTopHeight + dimensions.flapBottomHeight).toFixed(0)
+                    dimensions.templateType === 'invitation' || dimensions.templateType === 'custom' || dimensions.templateType === 'fold3'
+                    ? dimensions.height.toFixed(0)
+                    : (dimensions.height + dimensions.flapTopHeight + dimensions.flapBottomHeight).toFixed(0)
                   } mm
                 </span>
               </div>
@@ -459,6 +472,32 @@ export default function App() {
                           onChange={(e) => handleDimChange('height', Number(e.target.value))}
                           className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-mono"
                         />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-600">Màu nền</label>
+                        <input 
+                          type="color" 
+                          value={dimensions.backgroundColor || '#ffffff'}
+                          onChange={(e) => handleDimChange('backgroundColor', e.target.value)}
+                          className="w-full h-10 p-1 bg-white border border-slate-200 rounded-lg cursor-pointer"
+                        />
+                      </div>
+                      <div className="col-span-2 space-y-1.5">
+                        <label className="text-xs font-bold text-slate-600">Kích thước mẫu</label>
+                        <div className="flex flex-wrap gap-2">
+                          {PRESETS.map(p => (
+                            <button
+                              key={p.name}
+                              onClick={() => {
+                                handleDimChange('width', p.w);
+                                handleDimChange('height', p.h);
+                              }}
+                              className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-[10px] font-bold hover:bg-blue-50 hover:border-blue-200 transition-all"
+                            >
+                              {p.name}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                       {dimensions.templateType === 'box' && (
                         <div className="space-y-1.5">
